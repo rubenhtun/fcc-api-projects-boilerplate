@@ -18,34 +18,20 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-// Helper function to parse date input
-const parseDate = (dateString) => {
-  const timestamp = Number(dateString);
-
-  if (!isNaN(timestamp)) {
-    return new Date(timestamp);
-  }
-
-  const date = new Date(dateString);
-  return isNaN(date.getTime()) ? null : date;
-};
+// Function to check if a date is invalid
+const isInvalidDate = (date) => date.toUTCString() === "Invalid Date";
 
 // API endpoint to handle date requests
 app.get("/api/:date?", (req, res) => {
-  let dateParam = req.params.date;
+  let date = new Date(req.params.date);
 
-  if (!dateParam) {
-    const currentDate = new Date();
-    return res.json({
-      unix: currentDate.getTime(),
-      utc: currentDate.toUTCString(),
-    });
+  if (isInvalidDate(date)) {
+    date = new Date(parseInt(req.params.date));
   }
 
-  const date = parseDate(dateParam);
-
-  if (date === null) {
-    return res.json({ error: "Invalid Date" });
+  if (isInvalidDate(date)) {
+    res.json({ error: "Invalid Date" });
+    return;
   }
 
   res.json({
@@ -54,9 +40,11 @@ app.get("/api/:date?", (req, res) => {
   });
 });
 
-// your first API endpoint
-app.get("/api/hello", function (req, res) {
-  res.json({ greeting: "hello API" });
+app.get("/api", (req, res) => {
+  res.json({
+    unix: new Date().getTime(),
+    utc: new Date().toUTCString(),
+  });
 });
 
 // Listen on port set in environment variable or default to 3000
