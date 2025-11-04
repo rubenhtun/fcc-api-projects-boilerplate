@@ -15,8 +15,9 @@ app.use(express.json());
 
 app.use("/public", express.static(`${process.cwd()}/public`));
 
+// Root endpoint serving the HTML file
 app.get("/", function (req, res) {
-  res.sendFile(process.cwd() + "/views/index.html");
+  res.sendFile(__dirname + "/views/index.html");
 });
 
 // Short URL API endpoint
