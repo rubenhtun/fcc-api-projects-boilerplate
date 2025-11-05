@@ -14,17 +14,21 @@ app.get("/", function (req, res) {
 });
 
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const fileInfo = {
+      name: req.file.originalname,
+      type: req.file.mimetype,
+      size: req.file.size,
+    };
+
+    res.json(fileInfo);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
   }
-
-  const fileInfo = {
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size,
-  };
-
-  res.json(fileInfo);
 });
 
 const port = process.env.PORT || 3000;
